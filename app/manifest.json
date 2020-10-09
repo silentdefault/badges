@@ -1,0 +1,86 @@
+{
+    "name": "Badge.cat",
+    "display": "standalone",
+    "start_url": "/app",
+    "short_name": "Badge.cat",
+    "theme_color": "#686bd2",
+    "description": "create, share & earn badges by everything",
+    "orientation": "portrait",
+    "background_color": "#686bd2",
+    "related_applications": [],
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "assets/icons/icon_512.png",
+            "sizes": "512x512"
+        },
+        {
+            "src": "assets/icons/icon_192.png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "assets/icons/icon_48.png",
+            "sizes": "48x48"
+        },
+        {
+            "src": "assets/icons/icon_24.png",
+            "sizes": "24x24"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "assets/screenshots/screen.png"
+        },
+        {
+            "src": "assets/screenshots/screen.png"
+        },
+        {
+            "src": "assets/screenshots/screen.png"
+        }
+    ],
+    "features": [
+        "Cross Platform",
+        "fast",
+        "simple"
+    ],
+    "categories": [
+        "games",
+        "social",
+        "entertainment"
+    ],
+    "shortcuts": [
+        {
+            "name": "Redeem NOW",
+            "url": "/redeem/now",
+            "icons": [
+                {
+                    "src": "assets/icons/icon_192.png",
+                    "type": "image/png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Redeem by QR",
+            "url": "/scanner",
+            "icons": [
+                {
+                    "src": "assets/icons/icon_192.png",
+                    "type": "image/png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "View Badges",
+            "url": "/me/badges",
+            "icons": [
+                {
+                    "src": "assets/icons/icon_192.png",
+                    "type": "image/png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}
