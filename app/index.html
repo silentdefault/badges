@@ -4,10 +4,7 @@
 		<meta charset="utf-8" />
 		<title>Badge.cat</title>
 		<base href="/app" />
-		<meta
-			name="viewport"
-			content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
-		/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="description" content="This is a PWA Starter app" />
 		<meta name="theme-color" content="#686bd2" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -18,8 +15,15 @@
 		<link href="app/tuxedo.css" rel="stylesheet" />
 		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 		<script src="app/sword.js"></script>
+		<link rel="stylesheet" href="style.css">
+		<script src="app.js"></script>
 	</head>
-	<body>
-		<label>hey</label>
-	</body>
+	  <body>
+    <video id="camera" autoplay>You need a camera in order to use this app.</video>
+    <div id="snapshotLimitOverlay">
+        <div id="about">
+        </div>
+    </div>
+    <canvas id="snapshot"></canvas>
+  </body>
 </html>
