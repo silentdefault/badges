@@ -4,7 +4,7 @@
 		<meta charset="utf-8" />
 		<title>Badge.cat</title>
 		<base href="/app" />
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content="This is a PWA Starter app" />
 		<meta name="theme-color" content="#686bd2" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -13,17 +13,24 @@
 		<link rel="icon" href="app/assets/icons/icon_24.png" type="image/x-icon" />
 		<link rel="manifest" href="app/manifest.json" />
 		<link href="app/tuxedo.css" rel="stylesheet" />
-		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-		<script src="app/sword.js"></script>
-		<link rel="stylesheet" href="style.css">
-		<script src="app.js"></script>
+		<script defer src="app/sword.js"></script>
+		<script src="app/app.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			var socket = io();
+		</script>
 	</head>
-	  <body>
-    <video id="camera" autoplay>You need a camera in order to use this app.</video>
-    <div id="snapshotLimitOverlay">
-        <div id="about">
-        </div>
-    </div>
-    <canvas id="snapshot"></canvas>
-  </body>
+	<body>
+		<div id="scanner" hidden>
+			<video id="camera" autoplay>
+				You need a camera in order to use this app.
+			</video>
+			<div id="snapshotLimitOverlay"></div>
+			<canvas id="snapshot"></canvas>
+		</div>
+		<div id="index">
+			<button id="redeemNow">redeem "Now"</button>
+			<button id="redeemQR">redeem QR</button>
+		</div>
+	</body>
 </html>
