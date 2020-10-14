@@ -7,6 +7,11 @@ var MongoClient = require('mongodb').MongoClient;
 var url =
 	'mongodb+srv://silent:kvrVp7u9mUL7N8y9@cluster0.kyigf.azure.mongodb.net/badges?retryWrites=true&w=majority';
 
+var en = require('nanoid-good/locale/en');
+var es = require('nanoid-good/locale/es');
+var generate = require('nanoid-good/generate')(en, es);
+const library = '2346789ABCDEFGHJKLMNPQRTUVWXYZabcdefghijkmnpqrtwxyz';
+
 app.use('/app', express.static('app'));
 
 app.get('/reddem/:serialKey', (req, res) => {
@@ -37,86 +42,70 @@ http.listen(port, () => {
 	console.log(`Example app listening at http://localhost:${port}`);
 });
 
-// MongoClient.connect(
-// 	url,
-// 	{ useNewUrlParser: true, useUnifiedTopology: true },
-// 	function (err, db) {
-// 		if (err) throw err;
-// 		var dbo = db.db('cat');
-// 		// var myobj = {
-// 		// 	loc: { type: 'Point', coordinates: [26.002089, -98.075912] },
-// 		// 	name: 'Silent',
-// 		// };
-// 		// dbo.collection('customers').insertOne(myobj, function (err, res) {
-// 		// 	if (err) throw err;
-// 		// 	console.log('1 document inserted');
-// 		// 	db.close();
-// 		// });
-// 		// dbo.collection('customers').createIndex( { loc : "2dsphere" }, function (err, res) {
-// 		// 	if (err) throw err;
-// 		// 	console.log('1 document inserted');
-// 		// 	db.close();
-// 		// });
-// 		dbo.collection('activators').find({serialkey:"zxc"}).toArray(
-// 			function (err, result) {
-// 				if (err){
-// 					console.warn(err);
-// 				};
-// 				if (result) {
-//                     console.log(result);
-//                 }
-// 				db.close();
-// 			}
-// 		);
-// 	}
-// );
 io.on('connection', (socket) => {
 	console.log('a user connected');
-	socket.on('reddem', (msg) => {
+	socket.on('reddem', (query) => {
 		MongoClient.connect(
 			url,
 			{ useNewUrlParser: true, useUnifiedTopology: true },
 			function (err, db) {
 				if (err) throw err;
+				var date = +new Date();
 				db.db('cat')
-					.collection('BadgeActivators')
-					.find({
-						SerialKey: msg.serialKey,
-						Geoposition: {
-							$near: {
-								type: 'Point',
-								coordinates: [msg.long, msg.lat],
-							},
+					.collection('Activators')
+					.findOne(
+						{
+							$and: [
+								{ SerialKey: query.serialKey },
+								{
+									$or: [
+										{
+											'RangeDate.Start': { $lt: date },
+											'RangeDate.End': { $gte: date },
+										},
+										{ 'RangeDate.Start': -1, 'RangeDate.End': -1 },
+									],
+								},
+								{
+									Geoposition: {
+										$near: {
+											type: 'Point',
+											coordinates: [query.long, query.lat],
+										},
+										$maxDistance: 20,
+									},
+								},
+							],
 						},
-						StartDate: { $gte: +new Date() },
-						EndDate: { $lte: +new Date() },
-					})
-					.toArray(function (err, result) {
-						if (err) {
-							console.log(err);
-						}
-						if (result) {
+						async function (err, result) {
+							if (err) throw err;
+							if (!result) {
+								result = await db
+									.db('cat')
+									.collection('Activators')
+									.findOne({
+										$and: [
+											{ SerialKey: query.serialKey },
+											{
+												$or: [
+													{
+														'RangeDate.Start': { $lt: date },
+														'RangeDate.End': { $gte: date },
+													},
+													{ 'RangeDate.Start': -1, 'RangeDate.End': -1 },
+												],
+											},
+											{ Geoposition: null },
+										],
+									});
+							}
+							console.log(result);
 							io.emit('reddem', result);
+							db.close();
 						}
-						db.close();
-					});
+					);
 			}
 		);
 	});
-	socket.on('reddem test insert', (msg) => {
-		MongoClient.connect(
-			url,
-			{ useNewUrlParser: true, useUnifiedTopology: true },
-			function (err, db) {
-				if (err) throw err;
-				db.db('cat')
-				.collection('BadgeActivators')
-				.createIndex({ Geoposition: '2dsphere' }, function (err, res) {
-					if (err) throw err;
-					console.log('1 document inserted');
-					db.close();
-				});
-			}
-		);
-	});
+	socket.on('reddem test insert', (msg) => {});
 });

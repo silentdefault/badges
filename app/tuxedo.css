@@ -92,3 +92,9 @@ body {
 #about h4 {
     margin-top: 0;
 }
+
+@media print {
+    html, body {
+       display: none;  /* hide whole page */
+    }
+}

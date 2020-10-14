@@ -1,4 +1,4 @@
-var serialkey = '';
+var serialkey = "";
 function redeemA() {
 	navigator.geolocation.getCurrentPosition(showPosition);
 }
@@ -7,7 +7,7 @@ function showPosition(position) {
 	var { accuracy, latitude, longitude } = position.coords;
 	if (accuracy <= 30) {
 		socket.emit('reddem', {
-            serialkey:serialkey,
+            serialKey:serialkey,
 			lat: latitude,
 			long: longitude
 		});
