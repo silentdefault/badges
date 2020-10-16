@@ -1,0 +1,293 @@
+var DB = {
+	SerialKey: '',
+	GPS: [1, 2],
+	Date: +new Date(),
+};
+
+var Client = {
+	SerialKey: '',
+	GPS: [1, 2],
+	Date: +new Date(),
+};
+
+if (Client.SerialKey) {
+	if (DB.SerialKey == Client.SerialKey) {
+		if (DB.GPS) {
+			if (DB.GPS == Client.GPS) {
+				if (DB.Date) {
+					if (DB.Date == Client.Date) {
+						//case 1
+					} else {
+						//Case 0
+					}
+				} else {
+					//Case 2
+				}
+			} else {
+				//Case 0
+			}
+		} else {
+			if (DB.Date) {
+				if (DB.Date == Client.Date) {
+					//case 3
+				} else {
+					//Case 0
+				}
+			} else {
+				//Case 4
+			}
+		}
+	} else {
+		//Case 0
+	}
+} else if (DB.GPS) {
+	if (DB.GPS == Client.GPS) {
+		if (DB.Date) {
+			if (DB.Date == Client.Date) {
+				//Case 5
+			}
+		} else {
+			//Case 6
+		}
+	} else {
+		//Case 0
+	}
+} else if (DB.Date) {
+	if (DB.Date == Client.Date) {
+		//Case 7
+	} else {
+		//Case 0
+	}
+}
+
+/*
+Fase A:
+Case 0: Error, no redeem
+case 1: SerialKey, GPS, Date
+Case 2: SerialKey, GPS
+Case 3: SerialKey, Date
+Case 4: SerialKey
+Case 5: GPS, Date
+Case 6: GPS
+Case 7: Date
+Fase B:
+check if activator isn't limit count redeemed,
+if not; create register with activator and user
+*/
+[{$geoNear: {
+  near: {
+    type: 'Point',
+    coordinates: [
+      -98.0758816,
+      26.0020881
+    ]
+  },
+  distanceField: 'Distance',
+  maxDistance: 20,
+  query: {
+    $and: [
+      {
+        SerialKey: ''
+      },
+      {
+        $or: [
+          {
+            'RangeDate.Start': {
+              $lte: 1641013200000
+            },
+            'RangeDate.End': {
+              $gte: 1641013200000
+            }
+          },
+          {
+            'RangeDate.Start': -1,
+            'RangeDate.End': -1
+          }
+        ]
+      }
+    ]
+  }
+}}, {$lookup: {
+  from: 'Badges',
+  localField: 'Badge',
+  foreignField: '_id',
+  as: 'Badge'
+}}, {$project: {
+  _id: 1,
+  Serialkey: 1,
+  RedeemLimit: 1,
+  Distance: 1,
+  Badge: {
+    $arrayElemAt: [
+      '$Badge',
+      0
+    ]
+  }
+}}, {$lookup: {
+  from: 'BadgeTypes',
+  localField: 'Badge.Type',
+  foreignField: '_id',
+  as: 'Badge.Type'
+}}, {$lookup: {
+  from: 'Redeems',
+  localField: '_id',
+  foreignField: 'ActivatedBy',
+  as: 'Redeems'
+}}, {$match: {
+  Redeems: {
+    $not: {
+      $elemMatch: {
+        User: ObjectId('5f84aafca002ed9b9c8b5daa')
+      }
+    }
+  }
+}}, {$project: {
+  _id: 1,
+  Serialkey: 1,
+  RedeemLimit: 1,
+  Redeems: {$size: "$Redeems"},
+  Distance: 1,
+  Badge: {
+    _id: 1,
+    Name: 1,
+    Type: {
+    $arrayElemAt: [
+      '$Badge.Type',
+      0
+    ]
+  }
+  }
+}}, {
+  $expr: {
+    $or: [ {
+      $eq: [
+        '$RedeemLimit',
+        -1
+        ]
+    } ,{
+      $gt: [
+        '$RedeemLimit',
+        '$Redeems'
+        ]
+    }
+    ]
+  }
+}]
+
+------------------------------------------------------------------------------------------------------------
+
+[{$match: {
+    $and: [
+      {
+        SerialKey: 'asd'
+      },
+      {
+        $or: [
+          {
+            'RangeDate.Start': {
+              $lte: 1641013200000
+            },
+            'RangeDate.End': {
+              $gte: 1641013200000
+            }
+          },
+          {
+            'RangeDate.Start': -1,
+            'RangeDate.End': -1
+          }
+        ]
+      }
+    ]
+  }}, {$lookup: {
+  from: 'Badges',
+  localField: 'Badge',
+  foreignField: '_id',
+  as: 'Badge'
+}}, {$project: {
+  _id: 1,
+  Serialkey: 1,
+  RedeemLimit: 1,
+  Distance: 1,
+  Badge: {
+    $arrayElemAt: [
+      '$Badge',
+      0
+    ]
+  }
+}}, {$lookup: {
+  from: 'Redeems',
+  localField: 'Badge._id',
+  foreignField: 'Badge',
+  as: 'Badge.Redeems'
+}}, {$lookup: {
+  from: 'BadgeTypes',
+  localField: 'Badge.Type',
+  foreignField: '_id',
+  as: 'Badge.Type'
+}}, {$lookup: {
+  from: 'Redeems',
+  localField: '_id',
+  foreignField: 'ActivatedBy',
+  as: 'Redeems'
+}}, {$match: {
+  Redeems: {
+    $not: {
+      $elemMatch: {
+        User: ObjectId('5f84aafca002ed9b9c8b5daa')
+      }
+    }
+  },
+  "Badge.Creator": {
+    $not:{
+      $eq: ObjectId('5f84aafca002ed9b9c8b5daa')
+    }
+  }
+}}, {$project: {
+  _id: 1,
+  Serialkey: 1,
+  RedeemLimit: 1,
+  Redeems: {
+    $size: '$Redeems'
+  },
+  Distance: 1,
+  Badge: {
+    _id: 1,
+    Name: 1,
+    Redeems: {
+      $size: '$Badge.Redeems'
+    },
+    Type: {
+      $arrayElemAt: [
+        '$Badge.Type',
+        0
+      ]
+    }
+  }
+}}, {$match: {
+  $expr: {
+    $or: [ {
+      $and: [ {
+        $eq: [
+          '$RedeemLimit',-1
+        ]
+      }, {
+        $or:[{
+          $eq:["$Badge.Type.RedeemLimit",-1]
+
+                  },{
+          $gt: [
+            "$Badge.Type.RedeemLimit",
+            '$Badge.Redeems',
+            ]
+        }
+        ]
+      }]
+    } ,{
+      $gt: [
+        '$RedeemLimit',
+        '$Redeems'
+        ]
+    }
+    ]
+  }
+}}]

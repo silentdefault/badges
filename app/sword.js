@@ -1,4 +1,4 @@
-var serialkey = "";
+var serialkey = '';
 function redeemA() {
 	navigator.geolocation.getCurrentPosition(showPosition);
 }
@@ -7,9 +7,9 @@ function showPosition(position) {
 	var { accuracy, latitude, longitude } = position.coords;
 	if (accuracy <= 30) {
 		socket.emit('reddem', {
-            serialKey:serialkey,
+			serialKey: serialkey,
 			lat: latitude,
-			long: longitude
+			long: longitude,
 		});
 	} else {
 		navigator.geolocation.getCurrentPosition(showPosition);
@@ -49,4 +49,58 @@ document.querySelector('#redeemNow').addEventListener(
 
 socket.on('reddem', function (msg) {
 	console.log('result reddem: ' + msg);
+});
+
+var stripe = Stripe('pk_test_76s3qm5qS77ixe7Bbv77B1xc');
+var elements = stripe.elements();
+
+var elements = stripe.elements();
+var style = {
+	base: {
+		color: '#32325d',
+	},
+};
+
+var card = elements.create('card', { style: style });
+card.mount('#card-element');
+
+card.on('change', ({ error }) => {
+	const displayError = document.getElementById('card-errors');
+	if (error) {
+		displayError.textContent = error.message;
+	} else {
+		displayError.textContent = '';
+	}
+});
+var form = document.getElementById('payment-form');
+
+form.addEventListener('submit', function (ev) {
+	ev.preventDefault();
+	fetch('/secret')
+	.then(function (response) {
+		return response.json();
+	})
+	.then(function (responseJson) {
+		var clientSecret = responseJson.client_secret;
+		stripe
+		.confirmCardPayment(clientSecret, {
+			payment_method: {
+				card: card,
+				billing_details: {
+					name: 'Jenny Rosen',
+				},
+			},
+		})
+		.then(function (result) {
+			if (result.error) {
+				// Show error to your customer (e.g., insufficient funds)
+				console.log(result.error.message);
+			} else {
+				// The payment has been processed!
+				if (result.paymentIntent.status === 'succeeded') {
+					console.log("sucess");
+				}
+			}
+		});
+	});
 });
